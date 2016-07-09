@@ -20,6 +20,18 @@ var config = function config($stateProvider, $urlRouterProvider) {
 		url: '/characters',
 		controller: 'CharactersCtrl',
 		templateUrl: './templates/characters.html'
+	}).state('root.add', {
+		url: '/add',
+		controller: 'AddCtrl',
+		templateUrl: './templates/add.html'
+	}).state('root.details', {
+		url: '/details/:id',
+		controller: 'DetailsCtrl',
+		templateUrl: './templates/details.html'
+	}).state('root.delete', {
+		url: '/delete',
+		controller: 'DeleteCtrl',
+		templateUrl: './templates/delete.html'
 	});
 };
 config.$inject = ['$stateProvider', '$urlRouterProvider'];
@@ -33,19 +45,71 @@ module.exports = exports['default'];
 Object.defineProperty(exports, '__esModule', {
 	value: true
 });
-var CharactersCtrl = function CharactersCtrl($scope, CharactersService) {
+var AddCtrl = function AddCtrl($scope, CharactersService) {
+
+	$scope.addChar = function (char) {
+
+		CharactersService.addChar(char).then(function (res) {
+			console.log(res);
+		});
+	};
+};
+AddCtrl.$inject = ['$scope', 'CharactersService'];
+
+exports['default'] = AddCtrl;
+module.exports = exports['default'];
+
+},{}],3:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+	value: true
+});
+var CharactersCtrl = function CharactersCtrl($scope, CharactersService, $state) {
 	CharactersService.getCharacters().then(function (res) {
-		console.log(res.data.results);
+		console.log(res);
 		$scope.characters = res.data.results;
 	});
 };
 
-CharactersCtrl.$inject = ['$scope', 'CharactersService'];
+CharactersCtrl.$inject = ['$scope', 'CharactersService', '$state'];
 
 exports['default'] = CharactersCtrl;
 module.exports = exports['default'];
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var DeleteCtrl = function DeleteCtrl() {};
+DeleteCtrl.$inject = [];
+
+exports["default"] = DeleteCtrl;
+module.exports = exports["default"];
+
+},{}],5:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+	value: true
+});
+var DetailsCtrl = function DetailsCtrl($scope, CharactersService, $stateParams) {
+
+	var id = $stateParams;
+
+	CharactersService.getChar(id).then(function (res) {
+
+		$scope.char = res.data;
+	});
+};
+DetailsCtrl.$inject = ['$scope', 'CharactersService', '$stateParams'];
+
+exports['default'] = DetailsCtrl;
+module.exports = exports['default'];
+
+},{}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -60,7 +124,7 @@ HomeCtrl.$inject = ['$scope'];
 exports['default'] = HomeCtrl;
 module.exports = exports['default'];
 
-},{}],4:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
@@ -85,6 +149,18 @@ var _controllersCharactersCtrl = require('./controllers/characters.ctrl');
 
 var _controllersCharactersCtrl2 = _interopRequireDefault(_controllersCharactersCtrl);
 
+var _controllersAddCtrl = require('./controllers/add.ctrl');
+
+var _controllersAddCtrl2 = _interopRequireDefault(_controllersAddCtrl);
+
+var _controllersDetailsCtrl = require('./controllers/details.ctrl');
+
+var _controllersDetailsCtrl2 = _interopRequireDefault(_controllersDetailsCtrl);
+
+var _controllersDeleteCtrl = require('./controllers/delete.ctrl');
+
+var _controllersDeleteCtrl2 = _interopRequireDefault(_controllersDeleteCtrl);
+
 // Services
 
 var _servicesCharactersService = require('./services/characters.service');
@@ -103,9 +179,9 @@ _angular2['default'].module('app', ['ui.router']).constant('PARSE', {
 			'X-Parse-REST-API-Key': 'DqVGUTIVyQT3Bajx2Zzo7VqEQnqb064ISMFW3yrI'
 		}
 	}
-}).controller('HomeCtrl', _controllersHomeCtrl2['default']).controller('CharactersCtrl', _controllersCharactersCtrl2['default']).service('CharactersService', _servicesCharactersService2['default']).config(_config2['default']);
+}).controller('HomeCtrl', _controllersHomeCtrl2['default']).controller('CharactersCtrl', _controllersCharactersCtrl2['default']).controller('AddCtrl', _controllersAddCtrl2['default']).controller('DetailsCtrl', _controllersDetailsCtrl2['default']).controller('DeleteCtrl', _controllersDeleteCtrl2['default']).service('CharactersService', _servicesCharactersService2['default']).config(_config2['default']);
 
-},{"./config":1,"./controllers/characters.ctrl":2,"./controllers/home.ctrl":3,"./services/characters.service":5,"angular":8,"angular-ui-router":6,"jquery":9}],5:[function(require,module,exports){
+},{"./config":1,"./controllers/add.ctrl":2,"./controllers/characters.ctrl":3,"./controllers/delete.ctrl":4,"./controllers/details.ctrl":5,"./controllers/home.ctrl":6,"./services/characters.service":8,"angular":11,"angular-ui-router":9,"jquery":12}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -114,14 +190,27 @@ Object.defineProperty(exports, '__esModule', {
 var CharactersService = function CharactersService($http, PARSE) {
 
 	var url = PARSE.URL + 'classes/characters';
+	var headers = PARSE.CONFIG;
 
+	//Get all the Characters
 	this.getCharacters = function () {
-		return $http({
-			url: url,
-			headers: PARSE.CONFIG.headers,
-			method: 'GET'
-
-		});
+		return $http.get(url, headers);
+	};
+	//Ge a single Character
+	this.getChar = function (char) {
+		var id = char.id;
+		var path = url + '/' + id;
+		return $http.get(path, headers);
+	};
+	//Add a Character
+	this.addChar = function (char) {
+		return $http.post(url, char, headers);
+	};
+	//Delete a Character
+	this.deleteChar = function (char) {
+		var id = char.id;
+		var path = url + '/' + id;
+		return $http['delete'](path, headers);
 	};
 };
 
@@ -130,7 +219,7 @@ CharactersService.$inject = ['$http', 'PARSE'];
 exports['default'] = CharactersService;
 module.exports = exports['default'];
 
-},{}],6:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 /**
  * State-based routing for AngularJS
  * @version v0.3.1
@@ -4707,7 +4796,7 @@ angular.module('ui.router.state')
   .filter('isState', $IsStateFilter)
   .filter('includedByState', $IncludedByStateFilter);
 })(window, window.angular);
-},{}],7:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 /**
  * @license AngularJS v1.5.7
  * (c) 2010-2016 Google, Inc. http://angularjs.org
@@ -36181,11 +36270,11 @@ $provide.value("$locale", {
 })(window);
 
 !window.angular.$$csp().noInlineStyle && window.angular.element(document.head).prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>');
-},{}],8:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 require('./angular');
 module.exports = angular;
 
-},{"./angular":7}],9:[function(require,module,exports){
+},{"./angular":10}],12:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.2.4
  * http://jquery.com/
@@ -46001,7 +46090,7 @@ if ( !noGlobal ) {
 return jQuery;
 }));
 
-},{}]},{},[4])
+},{}]},{},[7])
 
 
 //# sourceMappingURL=main.js.map

@@ -5,6 +5,9 @@ import $ from 'jquery';
 // Controllers
 import HomeCtrl from './controllers/home.ctrl';
 import CharactersCtrl from './controllers/characters.ctrl';
+import AddCtrl from './controllers/add.ctrl';
+import DetailsCtrl from './controllers/details.ctrl';
+import DeleteCtrl from './controllers/delete.ctrl';
 // Services
 import CharactersService from './services/characters.service';
 
@@ -24,8 +27,11 @@ angular.module('app', ['ui.router'])
 
 	.controller('HomeCtrl', HomeCtrl)
 	.controller('CharactersCtrl', CharactersCtrl)
+	.controller('AddCtrl', AddCtrl)
+	.controller('DetailsCtrl', DetailsCtrl)
+	.controller('DeleteCtrl', DeleteCtrl)
 
-	.service('CharactersService',CharactersService)
+	.service('CharactersService', CharactersService)
 
 
 	.config(config)

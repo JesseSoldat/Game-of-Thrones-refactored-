@@ -2,7 +2,12 @@
 <h5>{{characters[0].firstName}} {{characters[0].lastName}}</h5>
 <img ng-src="{{characters[0].url}}"> -->
 
-<div ng-repeat="character in characters">
-	<h5>{{character.firstName}} {{character.lastName}}</h5>
-	<img ng-src="{{character.url}}">
+<div class="charContainer" ng-repeat="character in characters">
+	<h5 class="charTitle">{{character.firstName}} {{character.lastName}}</h5>
+
+	<a ng-href="#/details/{{character.objectId}}">
+	<button class="charBtn">View</button>
+	</a>
+
+	<img  class="charImg" ng-src="{{character.url}}">
 </div>
